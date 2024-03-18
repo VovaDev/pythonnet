@@ -64,6 +64,16 @@ class DotNetFinder(importlib.abc.MetaPathFinder):
             // create a python module with the same methods as the clr module-like object
             py_clr_module = new PyModule(Runtime.PyModule_New("clr").StealOrThrow());
 
+            UpdatePythonCLR();
+            SetupNamespaceTracking();
+            SetupImportHook();
+        }
+
+        /// <summary>
+        /// Updates python clr module to be in sync with root CLRModule
+        /// </summary>
+        private static void UpdatePythonCLR()
+        {
             // both dicts are borrowed references
             BorrowedReference mod_dict = Runtime.PyModule_GetDict(ClrModuleReference);
             using var clr_dict = Runtime.PyObject_GenericGetDict(root);
@@ -72,8 +82,6 @@ class DotNetFinder(importlib.abc.MetaPathFinder):
             BorrowedReference dict = Runtime.PyImport_GetModuleDict();
             Runtime.PyDict_SetItemString(dict, "CLR", ClrModuleReference);
             Runtime.PyDict_SetItemString(dict, "clr", ClrModuleReference);
-            SetupNamespaceTracking();
-            SetupImportHook();
         }
 
         /// <summary>
@@ -203,6 +211,7 @@ class DotNetFinder(importlib.abc.MetaPathFinder):
             {
                 throw PythonException.ThrowLastAsClrException();
             }
+            UpdatePythonCLR();
         }
 
         /// <summary>
@@ -238,6 +247,7 @@ class DotNetFinder(importlib.abc.MetaPathFinder):
                 {
                     throw PythonException.ThrowLastAsClrException();
                 }
+                UpdatePythonCLR();
             }
         }
 

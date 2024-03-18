@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Python.Runtime.Platform
 {
@@ -28,7 +29,7 @@ namespace Python.Runtime.Platform
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         _instance = new WindowsLoader();
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                        _instance = new PosixLoader(LinuxLibDL.GetInstance());
+                        _instance = new PosixLoader(IsAndroid ? AndroidLibDL.GetInstance() : LinuxLibDL.GetInstance());
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                         _instance = new PosixLoader(new MacLibDL());
                     else
@@ -40,6 +41,13 @@ namespace Python.Runtime.Platform
                 return _instance;
             }
         }
+
+        static readonly string[] ANDROID_VARS = new string[] {
+            "ANDROID_DATA", "ANDROID_ROOT", "ANDROID_RUNTIME_ROOT", "ANDROID_TZDATA_ROOT",
+            "ANDROID_ASSETS", "ANDROID_BOOTLOGO", "ANDROID_SOCKET_adbd", "ANDROID_STORAGE"
+        };
+
+        static bool IsAndroid => ANDROID_VARS.Any(n => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(n)));
     }
 
     class PosixLoader : ILibraryLoader
