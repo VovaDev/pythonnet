@@ -66,7 +66,7 @@ namespace Python.Runtime
 
         public static int MainManagedThreadId { get; private set; }
 
-        public static ShutdownMode ShutdownMode { get; internal set; }
+        public static ShutdownMode ShutdownMode { get; set; }
         private static readonly List<PyObject> _pyRefs = new ();
 
         internal static Version PyVersion
