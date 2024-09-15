@@ -32,6 +32,8 @@ namespace Python.Runtime.Platform
                         _instance = new PosixLoader(IsAndroid ? AndroidLibDL.GetInstance() : LinuxLibDL.GetInstance());
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                         _instance = new PosixLoader(new MacLibDL());
+                    else if (IsAndroid)
+                        _instance = new PosixLoader(AndroidLibDL.GetInstance());
                     else
                         throw new PlatformNotSupportedException(
                             "This operating system is not supported"
